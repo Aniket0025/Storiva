@@ -1,7 +1,20 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "./store/useAuthStore";
 import { cloudAccountService } from "./services/cloudAccountService";
-import { User, LogOut, ShieldCheck, Mail, Lock, UserPlus, LogIn, HardDrive, Plus, Trash2, CheckCircle2 } from "lucide-react";
+import { FileExplorer } from "./components/FileExplorer";
+import {
+  LogOut,
+  ShieldCheck,
+  Mail,
+  Lock,
+  UserPlus,
+  LogIn,
+  HardDrive,
+  Plus,
+  Trash2,
+  CheckCircle2,
+  User,
+} from "lucide-react";
 
 function App() {
   const { user, isAuthenticated, loading, error, checkAuth, login, register, logout } =
@@ -18,7 +31,6 @@ function App() {
     checkAuth();
   }, [checkAuth]);
 
-  // Check URL search parameters for OAuth callback redirect notification
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const connectStatus = params.get("connect");
@@ -33,7 +45,6 @@ function App() {
     }
   }, []);
 
-  // Fetch connected accounts when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       fetchAccounts();
@@ -56,7 +67,6 @@ function App() {
     try {
       const res = await cloudAccountService.initiateGoogleConnect();
       if (res.data?.url) {
-        // Redirect browser to Google Consent screen
         window.location.href = res.data.url;
       }
     } catch (err) {
@@ -98,7 +108,6 @@ function App() {
     );
   }
 
-  // Calculate total aggregate capacity
   const totalCapacity = accounts.reduce((acc, a) => acc + (a.storage?.total || 0), 0);
   const totalUsed = accounts.reduce((acc, a) => acc + (a.storage?.used || 0), 0);
   const totalAvailable = accounts.reduce((acc, a) => acc + (a.storage?.available || 0), 0);
@@ -111,11 +120,11 @@ function App() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 p-6 text-white font-sans">
-      <div className="max-w-2xl w-full space-y-6">
+      <div className="max-w-4xl w-full space-y-6">
         {/* Header Branding */}
         <div className="text-center space-y-2">
           <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wider text-cyan-400 bg-cyan-950/80 border border-cyan-800/50 rounded-full uppercase">
-            Phase 5 & 6 — Google Drive Integration Active
+            Phase 14 — Dashboard & File Explorer Active
           </span>
           <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent">
             Storiva
@@ -130,10 +139,10 @@ function App() {
           </div>
         )}
 
-        {/* User Logged In Dashboard */}
+        {/* Authenticated Dashboard */}
         {isAuthenticated && user ? (
           <div className="space-y-6">
-            {/* User Profile Summary */}
+            {/* User Profile Bar */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -145,22 +154,28 @@ function App() {
                     <p className="text-xs text-slate-400">{user.email}</p>
                   </div>
                 </div>
-                <button
-                  onClick={logout}
-                  className="flex items-center space-x-2 py-2 px-3 bg-red-950/60 hover:bg-red-900/80 border border-red-800/60 text-red-300 font-semibold rounded-xl text-xs transition duration-200"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Log Out</span>
-                </button>
+
+                <div className="flex items-center space-x-3">
+                  <span className="hidden sm:flex px-3 py-1 text-xs font-medium bg-emerald-950 text-emerald-400 border border-emerald-800/60 rounded-full items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5" /> Logged In
+                  </span>
+                  <button
+                    onClick={logout}
+                    className="flex items-center space-x-2 py-2 px-3 bg-red-950/60 hover:bg-red-900/80 border border-red-800/60 text-red-300 font-semibold rounded-xl text-xs transition duration-200"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Log Out</span>
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Aggregate Storage Overview */}
+            {/* Aggregate Storage Overview Card */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
                   <HardDrive className="w-4 h-4 text-cyan-400" />
-                  Unified Storage Overview
+                  Unified Storage Summary
                 </h3>
                 <button
                   onClick={handleConnectGoogle}
@@ -187,7 +202,10 @@ function App() {
               </div>
             </div>
 
-            {/* Connected Cloud Accounts List */}
+            {/* Interactive File Explorer Component */}
+            <FileExplorer onStorageChange={fetchAccounts} />
+
+            {/* Connected Accounts List Drawer */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-4">
               <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">
                 Connected Cloud Accounts ({accounts.length})
@@ -196,38 +214,33 @@ function App() {
               {accountsLoading ? (
                 <p className="text-xs text-slate-400">Loading connected accounts...</p>
               ) : accounts.length === 0 ? (
-                <div className="text-center py-6 border border-dashed border-slate-800 rounded-xl space-y-2">
-                  <p className="text-xs text-slate-400">No Google Drive accounts connected yet.</p>
+                <div className="text-center py-4 border border-dashed border-slate-800 rounded-xl space-y-1">
+                  <p className="text-xs text-slate-400">No cloud accounts connected yet.</p>
                   <button
                     onClick={handleConnectGoogle}
                     className="text-xs text-cyan-400 hover:underline font-semibold"
                   >
-                    Click here to connect your first Google Drive
+                    Connect your first Google Drive
                   </button>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {accounts.map((acc) => (
                     <div
                       key={acc.id}
-                      className="flex items-center justify-between p-3.5 bg-slate-950 rounded-xl border border-slate-800 text-xs"
+                      className="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs"
                     >
-                      <div className="space-y-0.5">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-bold text-white">{acc.email}</span>
-                          <span className="px-2 py-0.5 text-[10px] uppercase font-bold bg-cyan-950 text-cyan-400 border border-cyan-800/50 rounded-full">
-                            {acc.provider}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-500">
-                          Status: <span className="text-emerald-400 font-medium">{acc.status}</span>
+                      <div className="space-y-0.5 truncate">
+                        <span className="font-bold text-white block truncate">{acc.email}</span>
+                        <p className="text-[10px] text-slate-500">
+                          {formatBytes(acc.storage?.available)} free of {formatBytes(acc.storage?.total)}
                         </p>
                       </div>
 
                       <button
                         onClick={() => handleDisconnect(acc.id)}
-                        className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-950/50 rounded-lg transition"
-                        title="Disconnect Account"
+                        className="p-1.5 text-slate-500 hover:text-red-400 transition"
+                        title="Disconnect"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -238,8 +251,8 @@ function App() {
             </div>
           </div>
         ) : (
-          /* Authentication Form Card */
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6">
+          /* Auth Form Card */
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6 max-w-md mx-auto">
             <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800">
               <button
                 type="button"
@@ -340,7 +353,7 @@ function App() {
 
         {/* Footer info */}
         <p className="text-xs text-center text-slate-500">
-          Storiva Modular Monolith • Google OAuth Integration Active
+          Storiva Modular Monolith • Dashboard & File Explorer Active
         </p>
       </div>
     </main>
