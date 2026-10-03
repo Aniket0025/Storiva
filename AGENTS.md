@@ -29,6 +29,7 @@ Before changing code:
 - Make the smallest coherent change.
 - Run relevant tests/lint/type checks.
 - Update docs if needed.
+- Stage, test, and commit code at the end of every completed development phase.
 - Summarize changed files, tests, and any follow-up risks.
 
 ## Product principle

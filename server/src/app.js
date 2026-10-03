@@ -10,6 +10,7 @@ import { notFoundHandler } from "./middleware/notFoundHandler.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 import authRoutes from "./modules/auth/auth.routes.js";
+import cloudAccountRoutes from "./modules/cloudAccounts/cloudAccount.routes.js";
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.get("/api/v1/health", (req, res) => {
 
 // 6. Application Routes
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/cloud-accounts", cloudAccountRoutes);
 
 // 6. Handle 404 Unmatched Routes
 app.use(notFoundHandler);

@@ -1,17 +1,22 @@
 # Current Project Status
 
-## Active Phase: Provider Abstraction & Storage Manager (Completed)
+## Active Phase: Phase 5 & 6 — Google Cloud & Google OAuth 2.0 Integration (Completed)
 
 ### Implemented Baseline
-- **AES-256-GCM Encryption**: Secure encryption and decryption utility ([crypto.js](file:///media/Aniket/Storiva/server/src/utils/crypto.js)) for OAuth refresh/access tokens at rest.
-- **CloudAccount Model**: Mongoose schema ([cloudAccount.model.js](file:///media/Aniket/Storiva/server/src/modules/cloudAccounts/cloudAccount.model.js)) managing user cloud connections with hidden encrypted token fields.
-- **StorageProvider Contract**: Abstract provider interface ([StorageProvider.js](file:///media/Aniket/Storiva/server/src/providers/interfaces/StorageProvider.js)) defining clear contract for future provider integrations (`GoogleDriveProvider`, `OneDriveProvider`, etc.).
-- **StorageManager Allocation Service**: Allocation engine ([storageManager.service.js](file:///media/Aniket/Storiva/server/src/modules/storage/storageManager.service.js)) implementing `MOST_AVAILABLE_SPACE` algorithm and aggregate storage calculations.
-- **Automated Tests**: 14 passing Vitest tests covering Health API, Auth flow, AES-256-GCM encryption/decryption, aggregate storage calculation, and `MOST_AVAILABLE_SPACE` allocation selection.
+- **Google OAuth 2.0 Integration**:
+  - Authorization initiation endpoint (`POST /api/v1/cloud-accounts/google/connect`) returning Google Consent Screen URL with `access_type=offline` and `prompt=consent`.
+  - Cryptographically random state parameter (`oauth_state` cookie) enforcing strict CSRF protection on callback.
+  - Callback handler (`GET /api/v1/cloud-accounts/google/callback`) performing code exchange, profile fetching, AES-256-GCM token encryption, and `CloudAccount` document creation.
+- **GoogleDriveProvider SDK Integration**:
+  - Implemented `GoogleDriveProvider` class ([GoogleDriveProvider.js](file:///media/Aniket/Storiva/server/src/providers/googleDrive/GoogleDriveProvider.js)) under abstract `StorageProvider` interface.
+  - Automatic token refresh logic when `tokenExpiresAt` is reached.
+  - Full support for `getStorageInfo()`, `listFiles()`, `getFile()`, `createFolder()`, `renameFile()`, `deleteFile()`, and `searchFiles()`.
+- **Frontend OAuth Dashboard**:
+  - Interactive Connected Cloud Accounts manager in React ([App.jsx](file:///media/Aniket/Storiva/client/src/App.jsx)) with aggregate capacity metrics and Google Drive connection trigger.
+- **Automated Tests**: 18 passing Vitest tests across 4 suites (`health.test.js`, `auth.test.js`, `storageManager.test.js`, `cloudAccount.test.js`).
 
 ### Next Planned Milestone
-**Phase 5 & 6 — Google OAuth 2.0 Integration & GoogleDriveProvider**
-- Google OAuth connection endpoint (`POST /api/v1/cloud-accounts/google/connect`)
-- OAuth callback handler (`GET /api/v1/cloud-accounts/google/callback`)
-- State protection against CSRF
-- `GoogleDriveProvider` implementation under provider interface
+**Phase 8 & 9 & 10 — Unified File System & File Manager**
+- File metadata model (`File.js` / `Folder.js`)
+- Single & Multiple Drive file listing & browsing
+- File upload orchestration with `StorageManager`
