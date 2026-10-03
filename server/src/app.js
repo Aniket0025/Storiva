@@ -11,6 +11,10 @@ import { errorHandler } from "./middleware/errorHandler.js";
 
 import authRoutes from "./modules/auth/auth.routes.js";
 import cloudAccountRoutes from "./modules/cloudAccounts/cloudAccount.routes.js";
+import fileRoutes from "./modules/files/file.routes.js";
+import folderRoutes from "./modules/folders/folder.routes.js";
+import { search } from "./modules/files/file.controller.js";
+import { authenticate } from "./middleware/auth.middleware.js";
 
 const app = express();
 
@@ -57,6 +61,9 @@ app.get("/api/v1/health", (req, res) => {
 // 6. Application Routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/cloud-accounts", cloudAccountRoutes);
+app.use("/api/v1/files", fileRoutes);
+app.use("/api/v1/folders", folderRoutes);
+app.get("/api/v1/search", authenticate, search);
 
 // 6. Handle 404 Unmatched Routes
 app.use(notFoundHandler);
