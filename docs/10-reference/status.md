@@ -1,22 +1,17 @@
 # Current Project Status
 
-## Active Phase: Phase 5 & 6 — Google Cloud & Google OAuth 2.0 Integration (Completed)
+## Active Phase: Phase 8, 9 & 10 — Unified File System & File Manager (Completed)
 
 ### Implemented Baseline
-- **Google OAuth 2.0 Integration**:
-  - Authorization initiation endpoint (`POST /api/v1/cloud-accounts/google/connect`) returning Google Consent Screen URL with `access_type=offline` and `prompt=consent`.
-  - Cryptographically random state parameter (`oauth_state` cookie) enforcing strict CSRF protection on callback.
-  - Callback handler (`GET /api/v1/cloud-accounts/google/callback`) performing code exchange, profile fetching, AES-256-GCM token encryption, and `CloudAccount` document creation.
-- **GoogleDriveProvider SDK Integration**:
-  - Implemented `GoogleDriveProvider` class ([GoogleDriveProvider.js](file:///media/Aniket/Storiva/server/src/providers/googleDrive/GoogleDriveProvider.js)) under abstract `StorageProvider` interface.
-  - Automatic token refresh logic when `tokenExpiresAt` is reached.
-  - Full support for `getStorageInfo()`, `listFiles()`, `getFile()`, `createFolder()`, `renameFile()`, `deleteFile()`, and `searchFiles()`.
-- **Frontend OAuth Dashboard**:
-  - Interactive Connected Cloud Accounts manager in React ([App.jsx](file:///media/Aniket/Storiva/client/src/App.jsx)) with aggregate capacity metrics and Google Drive connection trigger.
-- **Automated Tests**: 18 passing Vitest tests across 4 suites (`health.test.js`, `auth.test.js`, `storageManager.test.js`, `cloudAccount.test.js`).
+- **Unified Metadata Models**: `File` Mongoose schema ([file.model.js](file:///media/Aniket/Storiva/server/src/modules/files/file.model.js)) and `Folder` schema ([folder.model.js](file:///media/Aniket/Storiva/server/src/modules/folders/folder.model.js)) storing provider account mappings.
+- **Upload Allocation Engine**: File upload pipeline ([file.service.js](file:///media/Aniket/Storiva/server/src/modules/files/file.service.js)) allocating winning `CloudAccount` via `MOST_AVAILABLE_SPACE` strategy and updating storage capacity.
+- **Multer Middleware**: Memory storage uploader ([file.routes.js](file:///media/Aniket/Storiva/server/src/modules/files/file.routes.js)) supporting file uploads up to 50MB.
+- **File & Folder Operations**: Comprehensive APIs for listing (`GET /api/v1/files`), uploading (`POST /api/v1/files/upload`), single file retrieval (`GET /api/v1/files/:id`), renaming (`PATCH /api/v1/files/:id`), deleting (`DELETE /api/v1/files/:id`), creating folders (`POST /api/v1/folders`), and searching (`GET /api/v1/search`).
+- **Automated Tests**: 23 passing Vitest tests across 5 test suites (`health.test.js`, `auth.test.js`, `storageManager.test.js`, `cloudAccount.test.js`, `fileSystem.test.js`).
 
 ### Next Planned Milestone
-**Phase 8 & 9 & 10 — Unified File System & File Manager**
-- File metadata model (`File.js` / `Folder.js`)
-- Single & Multiple Drive file listing & browsing
-- File upload orchestration with `StorageManager`
+**Phase 14 — Dashboard UI & Unified File Manager Interface**
+- Interactive React file manager UI
+- Folder tree navigation & file list view
+- Upload modal trigger
+- Search bar integration
